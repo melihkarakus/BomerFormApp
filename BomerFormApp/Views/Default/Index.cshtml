@@ -1,0 +1,159 @@
+﻿@model UserBomerViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üniversite Formu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Form alanlarına odaklanma (focus) animasyonu */
+        input, select, button {
+            transition: all 0.3s ease-in-out;
+        }
+
+            input:focus, select:focus {
+                border-color: #6c757d;
+                box-shadow: 0px 0px 10px rgba(108, 117, 125, 0.5);
+                transform: scale(1.05);
+            }
+
+            /* Dekont alanı hover efekti */
+            input[type="file"]:hover {
+                cursor: pointer;
+                background-color: #f8f9fa;
+            }
+
+        /* Gönder Butonu hover animasyonu */
+        button {
+            background-color: #007bff;
+            border: none;
+            transition: all 0.4s ease-in-out;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+                box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+                transform: translateY(-3px);
+            }
+
+        /* Form alanlarının görünür olma efekti */
+        .form-control, .form-select {
+            opacity: 0;
+            transform: translateY(-10px);
+            visibility: hidden;
+        }
+
+            .form-control.visible, .form-select.visible {
+                opacity: 1;
+                transform: translateY(0);
+                visibility: visible;
+            }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Kullanıcı Bilgileri Formu</h2>
+        <form method="post" enctype="multipart/form-data" class="mt-4 needs-validation" novalidate>
+            <!-- Kullanıcı Türü -->
+            <div class="mb-3">
+                <label for="userType" class="form-label">Üniversite Türü</label>
+                <select class="form-select" id="userType" onchange="toggleUniversityField()" required>
+                    <option value="">Lütfen Seçiniz...</option>
+                    <option value="ic">Üniversite İçi</option>
+                    <option value="dis">Üniversite Dışı</option>
+                </select>
+                <div class="invalid-feedback">Lütfen bir kullanıcı türü seçin.</div>
+            </div>
+
+            <!-- Üniversite (Üniversite dışı kullanıcılar için görünür) -->
+            <div id="universityField" class="mb-3" style="display: none;">
+                <label for="universityName" asp-for="University" class="form-label">Üniversite Adı</label>
+                <input type="text" class="form-control" id="universityName" name="University" asp-for="University" required>
+                <div class="invalid-feedback">Lütfen üniversite adını girin.</div>
+            </div>
+
+            <!-- Ad Soyad -->
+            <div class="mb-3">
+                <label for="fullName" asp-for="FullName" class="form-label">Ad Soyad</label>
+                <input type="text" class="form-control" id="fullName" name="FullName" asp-for="FullName" required>
+                <div class="invalid-feedback">Lütfen adınızı ve soyadınızı girin.</div>
+            </div>
+
+            <!-- Öğrenci Numarası -->
+            <div class="mb-3">
+                <label for="studentNo" asp-for="StudentNumber" class="form-label">Öğrenci Numarası</label>
+                <input type="number" class="form-control" id="studentNo" name="StudentNumber" asp-for="StudentNumber" required>
+                <div class="invalid-feedback">Lütfen öğrenci numaranızı girin.</div>
+            </div>
+
+            <!-- Fakülte -->
+            <div class="mb-3">
+                <label for="faculty" asp-for="Department" class="form-label">Fakülte</label>
+                <input type="text" class="form-control" id="faculty" name="Department" asp-for="Department" required>
+                <div class="invalid-feedback">Lütfen fakültenizi girin.</div>
+            </div>
+
+            <!-- Sınıf -->
+            <div class="mb-3">
+                <label for="class" asp-for="Class" class="form-label">Sınıf</label>
+                <input type="text" class="form-control" id="class" name="Class" asp-for="Class" required>
+                <div class="invalid-feedback">Lütfen sınıfınızı girin.</div>
+            </div>
+
+            <!-- E-posta -->
+            <div class="mb-3">
+                <label for="email" asp-for="Email" class="form-label">E-posta</label>
+                <input type="email" class="form-control" id="email" name="Email" asp-for="Email" required>
+                <div class="invalid-feedback">Lütfen geçerli bir e-posta adresi girin.</div>
+            </div>
+
+            <!-- Telefon Numarası -->
+            <div class="mb-3">
+                <label for="phone" asp-for="PhoneNumber" class="form-label">Telefon Numarası</label>
+                <input type="tel" class="form-control" id="phone" name="PhoneNumber" asp-for="PhoneNumber" pattern="[0-9]{10,11}" required>
+                <div class="invalid-feedback">Lütfen 10 veya 11 haneli telefon numaranızı girin.</div>
+            </div>
+
+            <!-- Dekont -->
+            <div class="mb-3">
+                <label for="receipt" asp-for="Dekont" class="form-label">Dekont</label>
+                <input type="file" class="form-control input-default" name="Dekont" placeholder="Resim" required />
+                <div class="invalid-feedback">Lütfen dekont dosyasını yükleyin.</div>
+            </div>
+
+            <!-- Gönder Butonu -->
+            <button type="submit" class="btn btn-primary w-100">Gönder</button>
+        </form>
+    </div>
+
+    <script>
+        // Üniversite alanını göster/gizle
+        function toggleUniversityField() {
+            const userType = document.getElementById('userType').value;
+            const universityField = document.getElementById('universityField');
+            if (userType === 'dis') {
+                universityField.style.display = 'block';
+                setTimeout(() => {
+                    universityField.querySelector('input').classList.add('visible');
+                }, 100);
+            } else {
+                universityField.style.display = 'none';
+                universityField.querySelector('input').classList.remove('visible');
+            }
+        }
+
+        // Form alanlarını girişte animasyonla görünür hale getirme
+        document.addEventListener('DOMContentLoaded', function () {
+            const formControls = document.querySelectorAll('.form-control, .form-select');
+            formControls.forEach(control => {
+                control.classList.add('visible');
+            });
+        });
+    </script>
+</body>
+</html>
